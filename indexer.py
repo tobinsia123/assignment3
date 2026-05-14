@@ -152,7 +152,8 @@ class Indexer:
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(final_index, f)
-
+        
+        self.unique_tokens = len(final_index)
         print(f"Saved merged final index to {output_path}")
 
     def save_metadata(self):
@@ -172,6 +173,7 @@ class Indexer:
         stats = {
             "documents_indexed": self.document_count,
             "partial_indexes_created": self.partial_count,
+            "unique_tokens": unique_tokens,
             "final_index_size_bytes": index_size,
             "final_index_size_mb": round(index_size / (1024 * 1024), 2)
         }
@@ -183,6 +185,7 @@ class Indexer:
         print("--------")
         print(f"Documents indexed: {self.document_count}")
         print(f"Partial indexes created: {self.partial_count}")
+        print(f"Unique tokens: {unique_tokens}")
         print(f"Final index size: {stats['final_index_size_mb']} MB")
 
     def run(self):
