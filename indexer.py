@@ -173,7 +173,7 @@ class Indexer:
         stats = {
             "documents_indexed": self.document_count,
             "partial_indexes_created": self.partial_count,
-            "unique_tokens": unique_tokens,
+            "unique_tokens": self.unique_tokens,
             "final_index_size_bytes": index_size,
             "final_index_size_mb": round(index_size / (1024 * 1024), 2)
         }
@@ -185,7 +185,7 @@ class Indexer:
         print("--------")
         print(f"Documents indexed: {self.document_count}")
         print(f"Partial indexes created: {self.partial_count}")
-        print(f"Unique tokens: {unique_tokens}")
+        print(f"Unique tokens: {self.unique_tokens}")
         print(f"Final index size: {stats['final_index_size_mb']} MB")
 
     def run(self):

@@ -1,3 +1,5 @@
 DEV/
-final_index/
 partial_indexes/
+final_index/doc_id_map.json
+final_index/doc_lengths.json
+final_index/inverted_index.json
