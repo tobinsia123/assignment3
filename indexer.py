@@ -40,7 +40,7 @@ class Indexer:
         normal_tokens = self.tokenize(all_text)
 
         important_text = ""
-
+        # important text would be big/emphasized texts (title/h1/h2/h3/b/strong)
         for tag in soup.find_all(["title", "h1", "h2", "h3", "b", "strong"]):
             important_text += " " + tag.get_text(separator=" ")
 
@@ -60,11 +60,12 @@ class Indexer:
                 return
 
             self.document_count += 1
+            # increment document_count to ensure uniqueness
             doc_id = str(self.document_count)
             self.doc_id_map[doc_id] = url
 
             normal_tokens, important_tokens = self.extract_weighted_tokens(html)
-
+            # token frequency dict
             tf = defaultdict(float)
 
             for token in normal_tokens:
@@ -75,7 +76,7 @@ class Indexer:
                 tf[token] += 3.0
 
             self.doc_lengths[doc_id] = len(normal_tokens)
-
+            # add to index
             for token, freq in tf.items():
                 self.index[token][doc_id] += freq
 
@@ -84,7 +85,9 @@ class Indexer:
 
     def build_partial_indexes(self):
         start = time.time()
-
+        # go through all website data
+        # process token frequencies for a file
+        # if reached flush limit (5000), flush by dumping into disk + clearing index 
         for root, _, files in os.walk(self.data_dir):
             for file in files:
                 if file.endswith(".json"):
@@ -100,6 +103,7 @@ class Indexer:
         elapsed = time.time() - start
         print(f"Finished building partial indexes in {elapsed:.2f} seconds.")
 
+    # dump current partial index into json
     def flush_partial_index(self):
         self.partial_count += 1
         output_path = os.path.join(self.partial_dir, f"partial_{self.partial_count}.json")
@@ -115,7 +119,7 @@ class Indexer:
         print(f"Saved {output_path}")
 
         self.index.clear()
-
+    # combine all partials at the end by merging frequencies.
     def merge_partial_indexes(self):
         merged = defaultdict(lambda: defaultdict(float))
 
@@ -135,6 +139,7 @@ class Indexer:
         final_index = {}
 
         for term, postings in merged.items():
+            # document frequency or # documents with word
             df = len(postings)
 
             final_index[term] = {
@@ -142,6 +147,7 @@ class Indexer:
                 "postings": [
                     {
                         "doc_id": doc_id,
+                        # use tf-idf in the future
                         "tf": freq
                     }
                     for doc_id, freq in postings.items()
