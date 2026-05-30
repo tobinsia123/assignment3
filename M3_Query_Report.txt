@@ -1,0 +1,89 @@
+Milestone 3 Query Report
+Dataset: Developer Dataset
+
+Overview
+
+For Milestone 3, we evaluated the search engine using a set of 20 queries. These queries were chosen to test both retrieval effectiveness and runtime efficiency. Half of the queries were selected because they produced relatively strong results, while the other half were selected because they exposed weaknesses in the ranking system, such as duplicated URLs, overly broad matches, image/detail pages appearing too highly, or pages matching only one query term.
+
+The goal of this milestone was to improve weaker queries while preserving the efficiency and general behavior of the search engine. The final search system uses a disk-based inverted index with a lexicon file that maps each term to its byte offset in the postings file. This allows the search component to retrieve only the postings needed for the query instead of loading the entire inverted index into memory.
+
+Good Performing Queries
+
+These queries generally returned relevant results and performed well in terms of runtime:
+
+1. artificial intelligence
+2. software engineering
+3. cybersecurity
+4. human computer interaction
+5. student affairs
+6. data mining
+7. academic advising
+8. informatics faculty
+9. masters computer science
+10. donald bren school
+
+These queries performed well because the top results usually contained most or all of the query terms and pointed to pages that were reasonably related to the user’s search intent. For example, “artificial intelligence” returned AI course pages and AI-related pages, “software engineering” returned software engineering course material, and “human computer interaction” returned HCI-related course notes and pages.
+
+Initially Poor or Weaker Queries
+
+These queries either produced weaker rankings, overly broad results, duplicate results, or results that were technically related but not ideal:
+
+1. machine learning
+2. computer science
+3. graduate admissions
+4. database systems
+5. network security
+6. ics degree requirements
+7. uci machine learning repository
+8. course catalog
+9. undergraduate admissions
+10. faculty research
+
+These queries were weaker for different reasons. For “machine learning,” some image/detail pages were ranked above more useful machine learning repository pages. For “database systems” and “network security,” some top results matched only one of the query terms even though better results should ideally match both terms. For “ics degree requirements,” several results were broad course pages or pages that matched “ics” without being specifically about degree requirements. For “uci machine learning repository,” some malformed or noisy URLs from the archive appeared in the top results. For “course catalog,” many results matched only “course” and did not necessarily correspond to an official catalog page.
+
+Changes Made to Improve the Search Engine
+
+1. Disk-Based Retrieval
+
+The original retrieval component loaded the entire inverted index into memory. This was not ideal for the developer option because the index is large. The updated version stores postings in a `postings.jsonl` file and stores term metadata in a separate `lexicon.json` file. Each lexicon entry stores the byte offset and length of the term’s postings in the postings file.
+
+At query time, the search engine loads only the lexicon and metadata files, then seeks directly to the postings for the query terms. This avoids loading the full postings file into memory and better satisfies the memory constraint for the developer option.
+
+2. Partial Indexes and K-Way Merge
+
+The indexer creates partial indexes while processing the corpus. In the final run, it created 12 partial indexes. This satisfies the requirement that the indexer offload the inverted index from memory to disk at least 3 times during construction.
+
+The final version also merges the sorted partial indexes using a k-way merge approach. This avoids keeping the entire merged inverted index in memory at once and writes the final postings directly to disk.
+
+3. Log-Scaled Term Frequency
+
+The original ranking used raw term frequency, which can cause pages with repeated terms to dominate the ranking. The updated ranking uses log-scaled term frequency:
+
+1 + log(tf)
+
+This reduces the impact of repeated terms while still rewarding pages where query terms appear more frequently.
+
+4. Document Length Normalization
+
+Some pages are very long and naturally contain many query terms. Without length normalization, long pages can score too highly simply because they contain more text. The updated ranking divides the tf-idf score by a document length factor. This helps shorter, more focused pages compete with very large pages.
+
+5. Query Coverage Boost
+
+The updated ranking rewards documents that match more of the query terms. For multi-word queries, a page that matches all terms should usually rank higher than a page that only matches one term many times. This helps improve queries such as “database systems,” “network security,” “graduate admissions,” and “ics degree requirements.”
+
+6. Important Word Weighting
+
+The indexer gives extra weight to terms that appear in important HTML tags, including title, h1, h2, h3, b, and strong. This helps pages rank higher when the query terms appear in structurally important parts of the page rather than only in normal body text.
+
+Runtime Performance
+
+The final search engine performed efficiently on the tested queries. All 20 queries completed under the expected 300 ms limit. Example query times included:
+
+* machine learning: about 31 ms
+* computer science: about 65 ms
+* graduate admissions: about 24 ms
+* artificial intelligence: about 15 ms
+* cybersecurity: about 2 ms
+* masters computer science: about 126 ms
+
+The slowest tested query was still under the required 300 ms threshold.

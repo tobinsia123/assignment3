@@ -8,10 +8,10 @@ import warnings
 from collections import defaultdict
 from urllib.parse import urldefrag
 
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, MarkupResemblesLocatorWarning
 from nltk.stem import PorterStemmer
 
-warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
 
 class Indexer:
