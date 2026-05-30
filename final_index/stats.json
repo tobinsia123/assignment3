@@ -1,7 +1,9 @@
 {
     "documents_indexed": 55393,
     "partial_indexes_created": 12,
-    "unique_tokens": 1066572,
-    "final_index_size_bytes": 441557641,
-    "final_index_size_mb": 421.1
+    "unique_tokens": 1066571,
+    "postings_size_bytes": 394315198,
+    "postings_size_mb": 376.05,
+    "lexicon_size_bytes": 63200945,
+    "lexicon_size_mb": 60.27
 }
