@@ -71,7 +71,6 @@ class Indexer:
             for token in normal_tokens:
                 tf[token] += 1.0
 
-            # Important words count more
             for token in important_tokens:
                 tf[token] += 3.0
 
