@@ -75,6 +75,13 @@ The updated ranking rewards documents that match more of the query terms. For mu
 
 The indexer gives extra weight to terms that appear in important HTML tags, including title, h1, h2, h3, b, and strong. This helps pages rank higher when the query terms appear in structurally important parts of the page rather than only in normal body text.
 
+7. URL Quality and Duplicate Filtering
+
+Some weaker queries returned image detail pages, slide pages, photo pages, malformed encoded URLs, or duplicate URLs near the top of the ranking. To improve this generally, the search engine applies a URL quality heuristic. It slightly penalizes URLs that appear to be image/detail pages, slide pages, photo pages, or malformed encoded URLs, and slightly rewards official/current-looking ICS, CS, Informatics, graduate, undergraduate, and UCI Machine Learning Repository pages.
+
+The search engine also filters exact duplicate URLs from the final ranked results. This improves result quality without targeting specific queries, because it addresses common crawler artifacts that can affect many different searches.
+
+
 Runtime Performance
 
 The final search engine performed efficiently on the tested queries. All 20 queries completed under the expected 300 ms limit. Example query times included:
